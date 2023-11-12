@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.26)
 project(app)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -11,6 +11,7 @@ include_directories(src)
 
 list(APPEND COMPILE_OPTIONS
         -std=c++20
+        -O3
         -fno-strict-overflow
         -Wno-deprecated-declarations
         -Wall
@@ -19,8 +20,12 @@ list(APPEND COMPILE_OPTIONS
         -Wno-unused-variable)
 
 add_executable(app
-        src/main.cpp src/window.cpp src/scene.h src/scene.cpp src/graphics.cpp src/model.cpp src/my_math.cpp)
+        src/main.cpp src/window.cpp src/scene.h src/scene.cpp src/graphics.cpp src/model.cpp
+        src/triangle.cpp
+        src/triangle.h
+        src/primitives.h)
 
-find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
-target_link_libraries(app Qt5::Core Qt5::Gui Qt5::Widgets)
 
+
+find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+target_link_libraries(app Qt6::Core Qt6::Gui Qt6::Widgets)
