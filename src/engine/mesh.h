@@ -6,6 +6,7 @@
 struct Face {
     int vert_indexes[3]{};
     int normal_indexes[3]{};
+    m3::vec3 rgb{255, 255, 255};
 };
 
 struct Mesh {

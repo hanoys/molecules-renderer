@@ -7,7 +7,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-include_directories(src3/math)
+include_directories(src/math)
 
 list(APPEND COMPILE_OPTIONS
         -std=c++20
@@ -20,18 +20,18 @@ list(APPEND COMPILE_OPTIONS
         -Wno-unused-variable)
 
 add_executable(app
-        src3/main.cpp
-        src3/window.cpp
-        src3/engine/loader.cpp
-        src3/engine/mesh.cpp
-        src3/engine/renderer.cpp
-        src3/math/m3pch.cpp
-        src3/math/Vec3.cpp
-        src3/math/Mat4.cpp
-        src3/math/Scalar.cpp
-        src3/math/Transform.cpp
-        src3/math/Quat.cpp
-        src3/engine/rasterizer.cpp
+        src/main.cpp
+        src/window.cpp
+        src/engine/loader.cpp
+        src/engine/mesh.cpp
+        src/engine/renderer.cpp
+        src/math/m3pch.cpp
+        src/math/Vec3.cpp
+        src/math/Mat4.cpp
+        src/math/Scalar.cpp
+        src/math/Transform.cpp
+        src/math/Quat.cpp
+        src/engine/rasterizer.cpp
 )
 
 

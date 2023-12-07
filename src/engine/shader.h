@@ -53,12 +53,13 @@ struct PhongShader : public IShader {
     m3::mat4 pv;
     m3::vec3 light_dir;
     m3::vec3 eye{0, 0, 1};
+    m3::vec3 lights[2];
 
     m3::vec3 rgb;
     float kd = 0.75f;
     float ks = 0.25f;
-    float spec_alpha = 4.f;
-    float ambient = 0.25f;
+    float spec_alpha = 32.f;
+    float ambient = 0.4f;
 
     virtual m3::vec3 vertex(const m3::vec3 &vertex, const m3::vec3 &normal, const m3::vec3 &light, size_t index) {
         normals[index] = normal;
@@ -70,9 +71,19 @@ struct PhongShader : public IShader {
         m3::vec3 n = m3::normalized(normals[0] * vertex.v[0] +
                                        normals[1] * vertex.v[1] +
                                        normals[2] * vertex.v[2]);
-        m3::vec3 reflection = m3::normalized((2 * m3::dot(light_dir, n) * n - light_dir));
-        float diffuse = m3::dot(n, light_dir);
-        float spect = std::pow(m3::dot(reflection, eye), spec_alpha);
-        return rgb * m3::max(0, m3::min(1, ks * spect + kd * diffuse + kd * ambient));
+//        m3::vec3 reflection = m3::normalized((2 * m3::dot(light_dir, n) * n - light_dir));
+//        float diffuse = m3::dot(n, light_dir);
+//        float spect = std::pow(m3::dot(reflection, eye), spec_alpha);
+//        return rgb * m3::max(0, m3::min(1, ks * spect + kd * diffuse + kd * ambient));
+
+        float intensity = 0;
+        for (int i = 0; i < 2; i++) {
+            m3::vec3 reflection = m3::normalized((2 * m3::dot(lights[i], n) * n - lights[i]));
+            float diffuse = m3::dot(n, lights[i]);
+            float spect = std::pow(m3::dot(reflection, eye), spec_alpha);
+            intensity += m3::min(1, ks * spect + kd * diffuse + kd * ambient);
+        }
+
+        return rgb * m3::max(0, m3::min(1, intensity));
     }
 };

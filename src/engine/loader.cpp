@@ -9,13 +9,18 @@
 using namespace m3;
 
 void Loader::load_model(const std::shared_ptr<Mesh> &m, const char *filename) {
-    std::ifstream in(filename);
+    load_materials(filename);
+    std::ifstream in(std::string(filename) + ".obj");
+    std::string current_material;
+    if (materials_file_found)
+        current_material = materials.begin()->first;
 
     while (!in.eof()) {
         char line[128];
         in.getline(line, 128);
         std::strstream s;
         s << line;
+        std::string sline(line);
         char junk;
         int ijunk;
 
@@ -42,11 +47,49 @@ void Loader::load_model(const std::shared_ptr<Mesh> &m, const char *filename) {
                 f.normal_indexes[i]--;
             }
 
+            if (materials_file_found)
+                f.rgb = materials[current_material];
+
             m->faces.push_back(f);
+        } else if (sline.starts_with("usemtl")) {
+            s.seekg(6, std::ios_base::cur);
+            s >> current_material;
         }
     }
     in.close();
     set_center(m);
+}
+
+void Loader::load_materials(const char *filename) {
+    std::ifstream in(std::string(filename) + ".mtl");
+    if (!in.is_open()) {
+        materials_file_found = false;
+        return;
+    }
+    std::string material_name;
+
+    while (!in.eof()) {
+        char line[128];
+        in.getline(line, 128);
+        std::strstream s;
+        s << line;
+        std::string sline(line);
+
+        if (sline.starts_with("newmtl")) {
+            s.seekg(6, std::ios_base::cur);
+            s >> material_name;
+            materials[material_name] = {0, 0, 0};
+        } else if (sline.starts_with("Kd")) {
+            s.seekg(2, std::ios_base::cur);
+            vec3 rgb;
+            s >> rgb.v[0] >> rgb.v[1] >> rgb.v[2];
+            rgb = rgb * 255;
+            materials[material_name] = rgb;
+            material_name.clear();
+        }
+    }
+
+    in.close();
 }
 
 m3::vec3 Loader::set_center(const std::shared_ptr<Mesh> &m) {

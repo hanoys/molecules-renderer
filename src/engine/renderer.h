@@ -16,6 +16,7 @@ public:
         z_buffer = new float[width * height];
         camera = cam;
         light = m3::normalized({-1.f, -1.f, -1.f});
+        light2 = m3::normalized({1.f, 1.f, 1.f});
     };
     void draw_mesh(const std::shared_ptr<Mesh> &mesh);
     void clear_zbuffer();
@@ -30,6 +31,7 @@ private:
     std::shared_ptr<IShader> shader;
     float *z_buffer;
     m3::vec3 light;
+    m3::vec3 light2;
 
     size_t width;
     size_t height;

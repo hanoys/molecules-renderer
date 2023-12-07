@@ -9,9 +9,11 @@ void Renderer::draw_mesh(const std::shared_ptr<Mesh> &m) {
     clear_zbuffer();
     PhongShader test_shader;
     test_shader.pv = camera->scale_matrix * camera->projection_matrix * camera->view_matrix;
-    test_shader.rgb = {0, 255, 0};
+    test_shader.lights[0] = light;
+    test_shader.lights[1] = light2;
 
     for (auto &face : m->faces) {
+        test_shader.rgb = face.rgb;
         vec3 vertices[3];
         vec3 normals[3];
         for (int i = 0; i < 3; i++) {
