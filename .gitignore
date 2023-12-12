@@ -2,6 +2,6 @@
 cmake-build-debug
 .idea
 .DS_Store
-model/*
+test_models/*
 .cache/*
 compile_commands.json
