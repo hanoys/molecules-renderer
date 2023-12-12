@@ -88,13 +88,28 @@ namespace m3 {
     mat4 rotate_y(float angle) {
         float c = cos(angle);
         float s = sin(angle);
-        return {c, 0, s, 0, 0, 1, 0, 0, -s, 0, c, 0, 0, 0, 0, 1};
+        return {c, 0, s, 0,
+                0, 1, 0, 0,
+                -s, 0, c, 0,
+                0, 0, 0, 1};
     }
 
     mat4 rotate_z(float angle) {
         float c = cos(angle);
         float s = sin(angle);
-        return {c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+        return {c, s, 0, 0,
+                -s, c, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1};
+    }
+
+    mat4 axis_rotation(vec3 axis, float angle) {
+        float c = cos(angle);
+        float s = sin(angle);
+        return {c + axis.x * axis.x * (1 - c), axis.x * axis.y * (1 - c) - axis.z * s, axis.x * axis.z * (1 - c) + axis.y * s, 0,
+                axis.y * axis.x * (1 - c) + axis.z * s, c + axis.y * axis.y * (1 - c), axis.y * axis.z * (1 - c) - axis.x * s, 0,
+                axis.z * axis.x * (1 - c) - axis.y * s, axis.z * axis.y * (1 - c) + axis.x * s, c + axis.z * axis.z * (1 - c), 0,
+                0, 0, 0, 1};
     }
 
 #define M4SWAP(x, y)                                                           \

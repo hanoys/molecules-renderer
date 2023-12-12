@@ -8,6 +8,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(src/math)
+include_directories(src/engine)
 
 list(APPEND COMPILE_OPTIONS
         -std=c++20
@@ -31,7 +32,12 @@ add_executable(app
         src/math/Scalar.cpp
         src/math/Transform.cpp
         src/math/Quat.cpp
-        src/engine/rasterizer.cpp
+        src/engine/scene.cpp
+        src/engine/render_manager.cpp
+        src/visualization/resources.h
+        src/visualization/resources.cpp
+        src/visualization/molecula_generator.h
+        src/visualization/molecula_generator.cpp
 )
 
 

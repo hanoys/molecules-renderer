@@ -16,5 +16,7 @@ struct Mesh {
     m3::vec3 center;
 
     void translate(m3::vec3 v);
+    void scale(m3::mat4 s);
     void rotate(m3::mat4 m);
+    void rotate_around_point(m3::mat4 m, m3::vec3 point);
 };

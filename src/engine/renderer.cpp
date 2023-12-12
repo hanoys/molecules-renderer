@@ -1,24 +1,23 @@
 #include "renderer.h"
 
+#include <utility>
+
 #include "Math3D.h"
 #include "Vec3.h"
 
 using namespace m3;
 
-void Renderer::draw_mesh(const std::shared_ptr<Mesh> &m) {
-    clear_zbuffer();
-    PhongShader test_shader;
-    test_shader.pv = camera->scale_matrix * camera->projection_matrix * camera->view_matrix;
-    test_shader.lights[0] = light;
-    test_shader.lights[1] = light2;
+void Renderer::draw_mesh(const Mesh &m) {
+    shader->pv = camera.scale_matrix * camera.projection_matrix * camera.view_matrix;
+    shader->lights = lights;
 
-    for (auto &face : m->faces) {
-        test_shader.rgb = face.rgb;
+    for (auto &face : m.faces) {
+        shader->rgb = face.rgb;
         vec3 vertices[3];
         vec3 normals[3];
         for (int i = 0; i < 3; i++) {
-            vertices[i] = m->verts[face.vert_indexes[i]];
-            normals[i] = m->normals[face.normal_indexes[i]];
+            vertices[i] = m.verts[face.vert_indexes[i]];
+            normals[i] = m.normals[face.normal_indexes[i]];
         }
 
         vec3 normal = normalized(normals[0] + normals[1] + normals[2]);
@@ -26,32 +25,32 @@ void Renderer::draw_mesh(const std::shared_ptr<Mesh> &m) {
         if (!back_face_culling(vertices[0], normal)) continue;
 
         for (int i = 0; i < 3; i++)
-            vertices[i] = test_shader.vertex(vertices[i], normals[i], light, i);
+            vertices[i] = shader->vertex(vertices[i], normals[i], i);
 
-        rasterize(vertices, test_shader);
+        rasterize(vertices);
     }
 }
 
 bool Renderer::back_face_culling(vec3 vertex, vec3 normal) {
-    return normal.x * (vertex.x - camera->pos.x) +
-           normal.y * (vertex.y - camera->pos.y) +
-           normal.z * (vertex.z - camera->pos.z) < 0.f;
+    return normal.x * (vertex.x - camera.pos.x) +
+           normal.y * (vertex.y - camera.pos.y) +
+           normal.z * (vertex.z - camera.pos.z) < 0.f;
 }
 
-void Renderer::rasterize(vec3 *vertices, IShader &test_shader) {
+void Renderer::rasterize(vec3 *vertices) {
     viewport_transform(vertices);
 
     if (vertices[0].y > vertices[1].y) {
         std::swap(vertices[0], vertices[1]);
-        std::swap(test_shader.normals[0], test_shader.normals[1]);
+        std::swap(shader->normals[0], shader->normals[1]);
     }
     if (vertices[0].y > vertices[2].y) {
         std::swap(vertices[0], vertices[2]);
-        std::swap(test_shader.normals[0], test_shader.normals[2]);
+        std::swap(shader->normals[0], shader->normals[2]);
     }
     if (vertices[1].y > vertices[2].y) {
         std::swap(vertices[1], vertices[2]);
-        std::swap(test_shader.normals[1], test_shader.normals[2]);
+        std::swap(shader->normals[1], shader->normals[2]);
     }
 
     int total_height= (int) (vertices[2].y - vertices[0].y);
@@ -78,14 +77,14 @@ void Renderer::rasterize(vec3 *vertices, IShader &test_shader) {
             if (P.x > 0 && P.x < width && P.y > 0 && P.y < height && z_buffer[idx] > P.z) {
                 z_buffer[idx] = P.z;
                 vec3 barycentric_coords = barycentric(vertices[0], vertices[1], vertices[2], P);
-                vec3 color_coefs = test_shader.fragment(barycentric_coords);
+                vec3 color_coefs = shader->fragment(barycentric_coords);
                 image->setPixel(P.x, P.y, qRgb(color_coefs.v[0],color_coefs.v[1],color_coefs.v[2]));
             }
         }
     }
 }
 
-void Renderer::box_rasterize(vec3 *vertices, IShader &test_shader) {
+void Renderer::box_rasterize(vec3 *vertices) {
     vec3 hW = {1/vertices[0].w, 1/vertices[1].w, 1/vertices[2].w};
     viewport_transform(vertices);
 
@@ -107,7 +106,7 @@ void Renderer::box_rasterize(vec3 *vertices, IShader &test_shader) {
             float depth = m3::dot({vertices[0].z, vertices[1].z, vertices[2].z}, clip);
             if (barycentric_coords.x < 0 || barycentric_coords.y < 0 || barycentric_coords.z < 0 || depth > z_buffer[x + y * width]) continue;
             z_buffer[x + y * width] = depth;
-            vec3 color_coefs = test_shader.fragment(barycentric_coords);
+            vec3 color_coefs = shader->fragment(barycentric_coords);
             image->setPixel(x, y, qRgb(color_coefs.v[0],color_coefs.v[1],color_coefs.v[2]));
         }
 }
@@ -122,4 +121,16 @@ void Renderer::viewport_transform(vec3 *vertices) const {
 void Renderer::clear_zbuffer() {
     for (int i = 0; i < image->width() * image->height(); i++)
         z_buffer[i] = std::numeric_limits<float>::max();
+}
+
+void Renderer::set_shader(std::shared_ptr<IShader> &shader) {
+    this->shader = std::move(shader);
+}
+
+void Renderer::set_camera(Camera &camera) {
+    this->camera = camera;
+}
+
+void Renderer::set_lights(std::vector<m3::vec3> &lights) {
+    this->lights = lights;
 }

@@ -116,6 +116,7 @@ namespace m3 {
     mat4 rotate_x(float angle);
     mat4 rotate_y(float angle);
     mat4 rotate_z(float angle);
+    mat4 axis_rotation(vec3 axis, float angle);
 
     mat4 frustum(float l, float r, float b, float t, float n, float f);
     mat4 perspective(float fov, float aspect, float znear, float zfar);
