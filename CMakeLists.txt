@@ -12,13 +12,14 @@ include_directories(src/engine)
 
 list(APPEND COMPILE_OPTIONS
         -std=c++20
-        -O3
+        -O2
         -fno-strict-overflow
         -Wno-deprecated-declarations
         -Wall
         -Wextra
         -Werror
         -Wno-unused-variable)
+
 
 add_executable(app
         src/main.cpp
@@ -40,6 +41,7 @@ add_executable(app
         src/visualization/molecula_generator.cpp
 )
 
-
+target_link_options(app PRIVATE
+        -flto)
 find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 target_link_libraries(app Qt6::Core Qt6::Gui Qt6::Widgets)

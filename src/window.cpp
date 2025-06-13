@@ -2,9 +2,13 @@
 #include "ui_mywindow.h"
 
 #include <QColor>
+#include <QMessageBox>
 #include <thread>
 #include <QTimer>
 #include <QKeyEvent>
+#include <iostream>
+#include <fstream>
+
 
 #include "engine/loader.h"
 #include "visualization/molecula_generator.h"
@@ -41,7 +45,7 @@ void MainWindow::setup_scene() {
                                       m3::vec3{0, 1, 0},
                                       45,
                                       (float) image->width() / (float) image->height());
-    cam.scale_matrix = m3::scale({1, -1, 1});
+    cam.scale_matrix = m3::scale({2, -2, 2});
 
     scene = std::make_shared<Scene>(cam);
     scene->add_light(m3::normalized({-0.8f, 0.f, -1.f}));
@@ -53,7 +57,6 @@ void MainWindow::setup_scene() {
 
 void MainWindow::draw() {
     image->fill(QColor(34,34,51));
-
     renderManager->render();
     pixmap->setPixmap(QPixmap::fromImage(*image));
 }
@@ -109,10 +112,15 @@ void MainWindow::start_button_pressed() {
 
     MoleculaGenerator g;
     g.init();
-    g.parse_string(formula);
-    for (auto &mesh : g.meshes)
-        scene->add_mesh(mesh);
-    molecula_center = meshes_center(g.meshes);
+    bool valid = g.parse_string(formula);
+    if (valid) {
+        for (auto &mesh : g.meshes)
+            scene->add_mesh(mesh);
+
+        molecula_center = meshes_center(g.meshes);
+    } else {
+        QMessageBox::critical(this, "Ошибка", "Введена неккоректная формула");
+    }
 }
 
 void MainWindow::flat_button_toggled(bool checked) {

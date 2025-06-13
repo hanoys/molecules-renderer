@@ -4,7 +4,7 @@
 #include <queue>
 
 void MoleculaGenerator::init() {
-    atoms_descriptions['C'] = AtomDescription{.rgb = {122, 122, 122},
+    atoms_descriptions['C'] = AtomDescription{.rgb = {142, 142, 142},
                                               .scale_factor = 0.6f,
                                               .valence = 4};
     atoms_descriptions['H'] = AtomDescription{.rgb = {255, 0, 0},
@@ -23,7 +23,20 @@ void MoleculaGenerator::init() {
     order.push_back(m_dir);
 }
 
-void MoleculaGenerator::parse_string(std::string formula) {
+bool MoleculaGenerator::check_formula(std::string formula) {
+    if (formula.size() == 0) return false;
+    std::transform(formula.begin(), formula.end(), formula.begin(), ::toupper);
+
+    for (int i = 0; i < formula.size(); i++) {
+        if (!atoms_descriptions.contains(formula[i]) && formula[i] != '=' && formula[i] != '#')
+            return false;
+    }
+
+    return true;
+}
+
+bool MoleculaGenerator::parse_string(std::string formula) {
+    if (!check_formula(formula)) return false;
     std::transform(formula.begin(), formula.end(), formula.begin(), ::toupper);
 
     m3::vec3 center = {0, 0, 0};
@@ -98,6 +111,8 @@ void MoleculaGenerator::parse_string(std::string formula) {
             bonds_count = 3;
         }
     }
+
+    return true;
 }
 
 void MoleculaGenerator::reflect_directions() {

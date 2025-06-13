@@ -9,6 +9,7 @@ struct Camera {
         this->up = up;
         projection_matrix = m3::perspective(fov, ratio, 0.1f, 10.f);
         view_matrix = m3::look_at(pos, target, up);
+        right = cross(up, normalized(target - pos) * -1.0f);
     }
 
     void update(m3::vec3 pos, m3::vec3 target, m3::vec3 up) {
@@ -25,4 +26,5 @@ struct Camera {
     m3::vec3 pos;
     m3::vec3 target;
     m3::vec3 up;
+    m3::vec3 right;
 };

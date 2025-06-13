@@ -2,8 +2,11 @@
 
 #include <utility>
 
+
 #include "Math3D.h"
 #include "Vec3.h"
+
+#define VERTICES_COUNT 3
 
 using namespace m3;
 
@@ -13,9 +16,9 @@ void Renderer::draw_mesh(const Mesh &m) {
 
     for (auto &face : m.faces) {
         shader->rgb = face.rgb;
-        vec3 vertices[3];
-        vec3 normals[3];
-        for (int i = 0; i < 3; i++) {
+        vec3 vertices[VERTICES_COUNT];
+        vec3 normals[VERTICES_COUNT];
+        for (int i = 0; i < VERTICES_COUNT; i++) {
             vertices[i] = m.verts[face.vert_indexes[i]];
             normals[i] = m.normals[face.normal_indexes[i]];
         }

@@ -21,10 +21,11 @@ public:
     MoleculaGenerator() = default;
 
     void init();
-    void parse_string(std::string formula);
+    bool parse_string(std::string formula);
 
     std::vector<Mesh> meshes;
 private:
+    bool check_formula(std::string formula);
     void place_atom(char atom_type, m3::vec3 center);
     void place_cylinder(m3::vec3 center, m3::vec3 direction, float len, BoundType type);
     void reflect_directions();
